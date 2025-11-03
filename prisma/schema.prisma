@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+//ENUMERATIONS
+enum TransactionType{
+  CREDIT
+  DEBIT
+}
+
+enum LedgerStatus{
+  GAIN
+  LOSS
+  NONE
+}
+
+//MODELS
+model Customer{
+  id String @id @map("_id") @default(auto()) @db.ObjectId
+  fullName String 
+  address String
+  phoneNumber String @unique
+  ledgerID String?
+  
+}
+
+model Transaction{
+  id String @id @map("_id") @default(auto()) @db.ObjectId
+  amount Int
+  type TransactionType
+  createdAt DateTime @default(now())
+  ledger Ledger @relation(fields: [ledgerId], references: [id])
+  ledgerId String @db.ObjectId
+  imgUrls String[]
+}
+
+model Ledger{
+  id String @id @map("_id") @default(auto()) @db.ObjectId
+  balance Int 
+  status LedgerStatus
+  transactions Transaction[] 
+}
+
+
+
