@@ -90,9 +90,9 @@ export const performTransaction = async (
   //get the user and ledger details
 
   try {
-    const { customerID, ledgerID, amount, typeOfTransaction, imgUrls } =
+    const { ledgerID, amount, typeOfTransaction, imgUrls } =
       request.body;
-    if (!ledgerID || !customerID || !amount || !typeOfTransaction || !imgUrls) {
+    if (!ledgerID || !amount || !typeOfTransaction || !imgUrls) {
       return response.status(400).json({
         success: false,
         statusCode: 400,
@@ -224,11 +224,13 @@ export const getAllTransactionsOfCustomer = async (
 ) => {
   try {
     const { ledgerID } = request.params;
-    if (!ledgerID) {
+    
+    // Type guard to ensure ledgerID is a string
+    if (!ledgerID || typeof ledgerID !== 'string') {
       return response.status(400).json({
         success: false,
-        statusCode: 500,
-        errors: ["Details Incomplete"],
+        statusCode: 400,
+        errors: ["Invalid ledger ID"],
       });
     }
 
@@ -299,7 +301,9 @@ export const getCustomersonSearch = async (
       orderBy: {
         fullName: 'asc'  // Sort results alphabetically
       }
-    });
+
+    }
+  );
 
     return response.status(200).json({
       success: true,
@@ -320,3 +324,40 @@ export const getCustomersonSearch = async (
     });
   }
 };
+
+export const getCustomerLedgerDetails = async (request:Request,response:Response)=>{
+  
+  try {
+    const {ledgerID} = request.query
+    console.log(ledgerID)
+    // Type guard to ensure ledgerID is a string
+    if (!ledgerID || typeof ledgerID !== 'string') {
+      return response.status(400).json({
+        success: false,
+        statusCode: 400,
+        errors: ["Invalid ledger ID"],
+      });
+    }
+
+    const ledger = await prisma.ledger.findUnique({
+      where:{
+        id:ledgerID
+      }
+    })
+
+     return response.status(200).json({
+      success: true,
+      statusCode: 200,
+      data: {
+        ledger:ledger
+      }
+    });
+  } catch (error:any) {
+     console.error('Search error:', error);
+    return response.status(500).json({
+      success: false,
+      statusCode: 500,
+      errors: ["Ledger not found", error.message]
+    });
+  }
+}

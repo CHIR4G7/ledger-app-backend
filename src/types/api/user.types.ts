@@ -15,7 +15,7 @@ export enum LedgerStatus{
 }
 
 export interface Transaction{
-   customerID:string,
+   
    ledgerID:string,
    amount:number,
    typeOfTransaction:TransactionType,
