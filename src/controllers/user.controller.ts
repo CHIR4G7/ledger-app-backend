@@ -194,7 +194,7 @@ export const performTransaction = async (
 
     console.log(
       "Updated ledger with transactions:",
-      updatedLedger.transactions,
+      newTransaction,
       "transactions"
     );
 
